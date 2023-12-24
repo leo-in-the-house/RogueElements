@@ -24,15 +24,8 @@ namespace RogueElements
             this.spawns = new List<SpawnRate>();
         }
 
-        public SpawnList(bool remove)
-        {
-            this.RemoveOnRoll = remove;
-            this.spawns = new List<SpawnRate>();
-        }
-
         protected SpawnList(SpawnList<T> other)
         {
-            this.RemoveOnRoll = other.RemoveOnRoll;
             this.spawnTotal = other.spawnTotal;
             this.spawns = new List<SpawnRate>();
             foreach (SpawnRate item in other.spawns)
@@ -47,12 +40,7 @@ namespace RogueElements
 
         public bool CanPick => this.spawnTotal > 0;
 
-        /// <summary>
-        /// False if this is a bag with replacement.  True if not.
-        /// </summary>
-        public bool RemoveOnRoll { get; }
-
-        public bool ChangesState => this.RemoveOnRoll;
+        public bool ChangesState => false;
 
         /// <summary>
         /// This is a shallow copy.
@@ -120,15 +108,23 @@ namespace RogueElements
 
         public T Pick(IRandom random)
         {
+           return Pick(random, false);
+        }
+
+        public T Pick(IRandom random, bool remove)
+        {
             int ii = this.PickIndex(random);
 
             T spawn = this.spawns[ii].Spawn;
-
-            if (this.RemoveOnRoll)
+            
+            if (remove)
+            {
                 this.RemoveAt(ii);
-
+            }
+            
             return spawn;
         }
+
 
         public int PickIndex(IRandom random)
         {
